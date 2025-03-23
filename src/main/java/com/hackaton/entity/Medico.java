@@ -1,6 +1,6 @@
-package entity;
+package com.hackaton.entity;
 
-import dto.CadastroMedicoDTO;
+import com.hackaton.dto.CadastroMedicoDTO;
 import jakarta.persistence.*;
 
 @Entity

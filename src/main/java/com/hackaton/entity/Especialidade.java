@@ -1,4 +1,4 @@
-package entity;
+package com.hackaton.entity;
 
 public enum Especialidade {
 

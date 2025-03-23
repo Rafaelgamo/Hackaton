@@ -1,7 +1,7 @@
-package dto;
+package com.hackaton.dto;
 
-import entity.Especialidade;
-import entity.Medico;
+import com.hackaton.entity.Especialidade;
+import com.hackaton.entity.Medico;
 
 public record MedicoDTO(
 
