@@ -1,14 +1,14 @@
-package service;
+package com.hackaton.service;
 
-import dto.CadastroMedicoDTO;
-import dto.MedicoDTO;
-import entity.Medico;
+import com.hackaton.dto.CadastroMedicoDTO;
+import com.hackaton.dto.MedicoDTO;
+import com.hackaton.entity.Medico;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import repository.MedicoRepository;
+import com.hackaton.repository.MedicoRepository;
 
 import java.util.Optional;
 

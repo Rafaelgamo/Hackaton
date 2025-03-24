@@ -1,14 +1,14 @@
-package controller;
+package com.hackaton.controller;
 
-import dto.CadastroMedicoDTO;
-import dto.MedicoDTO;
+import com.hackaton.dto.CadastroMedicoDTO;
+import com.hackaton.dto.MedicoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import service.MedicoService;
+import com.hackaton.service.MedicoService;
 
 
 @RestController

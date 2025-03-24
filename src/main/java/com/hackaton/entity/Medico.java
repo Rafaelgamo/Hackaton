@@ -1,10 +1,10 @@
-package entity;
+package com.hackaton.entity;
 
-import dto.CadastroMedicoDTO;
+import com.hackaton.dto.CadastroMedicoDTO;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "teste")
+@Table(name = "medico")
 public class Medico {
 
     @Id

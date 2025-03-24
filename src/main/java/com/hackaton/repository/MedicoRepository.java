@@ -1,6 +1,6 @@
-package repository;
+package com.hackaton.repository;
 
-import entity.Medico;
+import com.hackaton.entity.Medico;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

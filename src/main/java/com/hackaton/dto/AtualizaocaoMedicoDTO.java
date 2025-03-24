@@ -1,6 +1,6 @@
-package dto;
+package com.hackaton.dto;
 
-import entity.Especialidade;
+import com.hackaton.entity.Especialidade;
 
 public record AtualizaocaoMedicoDTO(
         Long id,
