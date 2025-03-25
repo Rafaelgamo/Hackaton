@@ -3,6 +3,8 @@ package com.hackaton.dto;
 import com.hackaton.entity.Especialidade;
 import com.hackaton.entity.Medico;
 
+import java.sql.Time;
+
 public record MedicoDTO(
 
         Long id,
