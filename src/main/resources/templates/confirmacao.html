@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>SUS - Confirmação de Agendamento</title>
+    </head>
+    <body>
+        <p>Olá, <b th:text="${nomePaciente}">Paciente SUS</b>!</p>
+
+        <p>Você tem uma consulta agendada conosco para:</p>
+        <p><strong>Data:</strong> <span th:text="${dataAgendamento}">DATA_AGENDAMENTO</span></p>
+        <p><strong>Horário:</strong> <span th:text="${horaAgendamento}">HORA_AGENDAMENTO</span></p>
+        <p><strong>Especialidade:</strong> <span th:text="${especialidade}">ESPECIALIDADE</span></p>
+
+        <p>Por favor, confirme ou cancele sua consulta clicando nos botões abaixo:</p>
+        <a th:href="@{${urlConfirmar}}">Confirmar Consulta</a>
+        <a th:href="@{${urlCancelar}}">Cancelar Consulta</a>
+        <p>Atenciosamente,<br>SUS - Sistema Único de Saúde</p>
+    </body>
+</html>
