@@ -1,6 +1,12 @@
 package com.hackaton.entity;
 
 import jakarta.persistence.*;
+import jdk.jfr.Timestamp;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "medico")
@@ -16,6 +22,7 @@ public class Medico {
 
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
+
 
     private String hora_entrada;
 

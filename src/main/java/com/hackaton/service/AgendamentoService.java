@@ -1,6 +1,7 @@
 package com.hackaton.service;
 
 import com.hackaton.dto.AgendamentoDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 
 @Service
 public class AgendamentoService {
+
 
     private final EmailService emailService;
 
