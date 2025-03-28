@@ -67,6 +67,7 @@ public class AgendamentoService {
         return null;
     }
 
+    // TODO: MVP - Esse método permite que agendamentos com data maior do que a atual seja concluído para facilitar os testes desta POC
     public AgendamentoConcluidoDTO concluirAgendamento(Long agendamentoId, ConcluirAgendamentoDTO concluirAgendamentoDTO) {
         var optById = agendamentoRepository.findById(agendamentoId);
         if (optById.isEmpty()) {
