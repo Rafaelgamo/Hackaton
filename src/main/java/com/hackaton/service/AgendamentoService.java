@@ -79,39 +79,7 @@ public class AgendamentoService {
 
         NovoAgendamentoDTO retorno = null;
         if (concluirAgendamentoDTO.agendarRetorno()) {
-            var medicoId = agendamentoConcluido.getMedico().getId();
-            var pacienteId = agendamentoConcluido.getPaciente().getId();
-
-            var novaData = LocalDate.now().plusDays(DIAS_PARA_RETORNO);
-            var novaHora = agendamentoConcluido.getHora();
-
-            var horariosDisponiveisNaData = listarHorariosDisponiveisPorDiaEMedico(novaData, medicoId);
-            if (horariosDisponiveisNaData.isEmpty()) {
-                throw new RuntimeException("Médico indisponível na data do retorno - " + novaData);
-            }
-
-            boolean horaDaConsultaLivre = false;
-            for (AgendamentoDisponivelDTO agendamentoDisponivelDTO : horariosDisponiveisNaData) {
-                if (agendamentoDisponivelDTO.hora().equals(novaHora)) {
-                    horaDaConsultaLivre = true;
-                    break;
-                }
-            }
-
-            if (!horaDaConsultaLivre) {
-                novaHora = horariosDisponiveisNaData.get(0).hora();
-            }
-
-            var retornoNovoAgendamentoDTO = new NovoAgendamentoDTO(
-                    null,
-                    medicoId,
-                    pacienteId,
-                    StatusConfirmacao.AGENDADO.getName(),
-                    novaData,
-                    novaHora
-            );
-
-            retorno = realizarAgendamento(retornoNovoAgendamentoDTO);
+            retorno = agendarRetorno(agendamentoConcluido, DIAS_PARA_RETORNO);
         }
 
         agendamentoRepository.save(agendamentoConcluido);
@@ -120,6 +88,42 @@ public class AgendamentoService {
             new AgendamentoDTO(agendamentoConcluido),
             retorno == null ? null : new AgendamentoDTO(retorno)
         );
+    }
+
+    public NovoAgendamentoDTO agendarRetorno(Agendamento agendamentoConcluido, Long diasParaRetorno) {
+        var medicoId = agendamentoConcluido.getMedico().getId();
+        var pacienteId = agendamentoConcluido.getPaciente().getId();
+
+        var novaData = LocalDate.now().plusDays(diasParaRetorno);
+        var novaHora = agendamentoConcluido.getHora();
+
+        var horariosDisponiveisNaData = listarHorariosDisponiveisPorDiaEMedico(novaData, medicoId);
+        if (horariosDisponiveisNaData.isEmpty()) {
+            throw new RuntimeException("Médico indisponível na data do retorno - " + novaData);
+        }
+
+        boolean horaDaConsultaLivre = false;
+        for (AgendamentoDisponivelDTO agendamentoDisponivelDTO : horariosDisponiveisNaData) {
+            if (agendamentoDisponivelDTO.hora().equals(novaHora)) {
+                horaDaConsultaLivre = true;
+                break;
+            }
+        }
+
+        if (!horaDaConsultaLivre) {
+            novaHora = horariosDisponiveisNaData.get(0).hora();
+        }
+
+        var retornoNovoAgendamentoDTO = new NovoAgendamentoDTO(
+            null,
+            medicoId,
+            pacienteId,
+            StatusConfirmacao.AGENDADO.getName(),
+            novaData,
+            novaHora
+        );
+
+        return realizarAgendamento(retornoNovoAgendamentoDTO);
     }
 
     public NovoAgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
