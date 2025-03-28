@@ -30,7 +30,22 @@ public class Medico {
 
     private Boolean ativo;
 
+    public Medico(Long id, String nome, String crm, Especialidade especialidade, String hora_entrada, String hora_saida, Boolean ativo) {
+        this.id = id;
+        this.nome = nome;
+        this.crm = crm;
+        this.especialidade = especialidade;
+        this.hora_entrada = hora_entrada;
+        this.hora_saida = hora_saida;
+        this.ativo = ativo;
+    }
+
+    public Medico(long id) {
+        this.id = id;
+    }
+
     public Medico() {}
+
 
     public Long getId() {
         return id;
