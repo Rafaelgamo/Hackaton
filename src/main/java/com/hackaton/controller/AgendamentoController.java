@@ -2,11 +2,14 @@ package com.hackaton.controller;
 
 import com.hackaton.controller.json.AgendamentoDisponivelJson;
 import com.hackaton.controller.json.NovoAgendamentoJson;
+import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.service.AgendamentoService;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,9 +38,7 @@ public class AgendamentoController {
     @GetMapping("/disponiveis")
     public ResponseEntity<List<AgendamentoDisponivelJson>> listarHorariosDisponiveisPorDiaEMedico(
         @RequestParam("medicoId") Long medicoId,
-//        @Pattern(regexp = "[1-2]\\d{3}-[0-1]?\\d-[0-3]?\\d", message = "A 'data' deve estar no padrão YYYY-MM-DD.")
-        @RequestParam("data")
-        String data
+        @DateTimeFormat(pattern = "HH:mm") @RequestParam("data") String data
     ) {
         var localDateData = LocalDate.parse(data);
 
@@ -55,6 +56,18 @@ public class AgendamentoController {
         var jsons = disponiveisDTOs.stream().map(AgendamentoDisponivelJson::new).toList();
 
         return ResponseEntity.ok(jsons);
+    }
+
+    @GetMapping("/paciente/{idPaciente}")
+    public ResponseEntity<List<AgendamentoDTO>> listarPorPaciente(@PathVariable Long idPaciente) {
+        var porPaciente = agendamentoService.listarPorPaciente(idPaciente);
+        return ResponseEntity.ok(porPaciente);
+    }
+
+    @GetMapping("/medico/{idMedico}")
+    public ResponseEntity<List<AgendamentoDTO>> listarPorMedico(@PathVariable Long idMedico) {
+        var porPaciente = agendamentoService.listarPorMedico(idMedico);
+        return ResponseEntity.ok(porPaciente);
     }
 
     @PostMapping("/email")

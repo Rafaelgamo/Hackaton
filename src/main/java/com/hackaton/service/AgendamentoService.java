@@ -4,6 +4,7 @@ import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.AgendamentoDisponivelDTO;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.entity.Agendamento;
+import com.hackaton.entity.Medico;
 import com.hackaton.entity.Paciente;
 import com.hackaton.entity.StatusConfirmacao;
 import com.hackaton.repository.AgendamentoRepository;
@@ -173,4 +174,13 @@ public class AgendamentoService {
         return horariosDisponiveis;
     }
 
+    public List<AgendamentoDTO> listarPorPaciente(Long idPaciente) {
+        var paciente = new Paciente(idPaciente);
+        return agendamentoRepository.findAllByPaciente(paciente).stream().map(AgendamentoDTO::new).toList();
+    }
+
+    public List<AgendamentoDTO> listarPorMedico(Long idMedico) {
+        var medico = new Medico(idMedico);
+        return agendamentoRepository.findAllByMedico(medico).stream().map(AgendamentoDTO::new).toList();
+    }
 }
