@@ -13,7 +13,7 @@ public class SchedulingConfiguration {
     Logger logger = LoggerFactory.getLogger(SchedulingConfiguration.class);
 
     @PostConstruct
-    public void init(){
+    public void init() {
         logger.info("Spring Job Scheduling enabled");
     }
 }

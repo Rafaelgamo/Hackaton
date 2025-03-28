@@ -1,7 +1,9 @@
 package com.hackaton.controller;
 
 import com.hackaton.controller.json.AgendamentoDisponivelJson;
+import com.hackaton.controller.json.ConcluirAgendamentoJson;
 import com.hackaton.controller.json.NovoAgendamentoJson;
+import com.hackaton.dto.AgendamentoConcluidoDTO;
 import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.service.AgendamentoService;
@@ -35,10 +37,19 @@ public class AgendamentoController {
         return ResponseEntity.ok(horarioAgendado);
     }
 
+    @PostMapping("/concluir/{idAgendamento}")
+    public ResponseEntity<AgendamentoConcluidoDTO> concluirAgendamento(
+            @PathVariable Long idAgendamento,
+            @RequestBody ConcluirAgendamentoJson concluirAgendamentoJson
+    ) {
+        var conclusaoAgendamentoDTO = agendamentoService.concluirAgendamento(idAgendamento, concluirAgendamentoJson.toDTO());
+        return ResponseEntity.ok(conclusaoAgendamentoDTO);
+    }
+
     @GetMapping("/disponiveis")
     public ResponseEntity<List<AgendamentoDisponivelJson>> listarHorariosDisponiveisPorDiaEMedico(
-        @RequestParam("medicoId") Long medicoId,
-        @DateTimeFormat(pattern = "HH:mm") @RequestParam("data") String data
+            @RequestParam("medicoId") Long medicoId,
+            @DateTimeFormat(pattern = "HH:mm") @RequestParam("data") String data
     ) {
         var localDateData = LocalDate.parse(data);
 

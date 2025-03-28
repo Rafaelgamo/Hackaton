@@ -14,34 +14,35 @@ public record NovoAgendamentoJson(
         @NotNull @Positive Long idMedico,
         @NotNull @Positive Long idPaciente,
         String status,
-        @DateTimeFormat(pattern = "YYYY-MM-DD")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         String data,
         @DateTimeFormat(pattern = "HH:mm")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         String hora
 ) {
 
-        private static final DateTimeFormatter dataFormatter = DateTimeFormatter.ofPattern("YYYY-MM-DD");
-        private static final DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter dataFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter horaFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        public NovoAgendamentoJson(NovoAgendamentoDTO novoAgendamentoDTO) {
-                this(
-                        novoAgendamentoDTO.idMedico(),
-                        novoAgendamentoDTO.idPaciente(),
-                        novoAgendamentoDTO.status(),
-                        novoAgendamentoDTO.data().format(dataFormatter),
-                        novoAgendamentoDTO.hora().format(horaFormatter)
-                );
-        }
+    public NovoAgendamentoJson(NovoAgendamentoDTO novoAgendamentoDTO) {
+        this(
+                novoAgendamentoDTO.idMedico(),
+                novoAgendamentoDTO.idPaciente(),
+                novoAgendamentoDTO.status(),
+                novoAgendamentoDTO.data().format(dataFormatter),
+                novoAgendamentoDTO.hora().format(horaFormatter)
+        );
+    }
 
-        public NovoAgendamentoDTO toDTO() {
-                return new NovoAgendamentoDTO(
-                        this.idMedico,
-                        this.idPaciente,
-                        this.status,
-                        LocalDate.parse(this.data),
-                        LocalTime.parse(this.hora)
-                );
-        }
+    public NovoAgendamentoDTO toDTO() {
+        return new NovoAgendamentoDTO(
+                null,
+                this.idMedico,
+                this.idPaciente,
+                this.status,
+                LocalDate.parse(this.data),
+                LocalTime.parse(this.hora)
+        );
+    }
 }

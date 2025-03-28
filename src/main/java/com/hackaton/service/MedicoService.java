@@ -59,7 +59,7 @@ public class MedicoService {
             var alter = medicoRepository.save(medico);
             return ResponseEntity.ok(alter);
         }
-       return null;
+        return null;
     }
 
     @Transactional

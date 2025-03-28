@@ -1,12 +1,12 @@
 package com.hackaton.entity;
 
-import jakarta.persistence.*;
-import jdk.jfr.Timestamp;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "medico")
@@ -44,12 +44,14 @@ public class Medico {
         this.id = id;
     }
 
-    public Medico() {}
+    public Medico() {
+    }
 
 
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -57,6 +59,7 @@ public class Medico {
     public String getNome() {
         return nome;
     }
+
     public void setNome(String nome) {
         this.nome = nome;
     }
@@ -64,6 +67,7 @@ public class Medico {
     public String getCrm() {
         return crm;
     }
+
     public void setCrm(String crm) {
         this.crm = crm;
     }
@@ -71,6 +75,7 @@ public class Medico {
     public Especialidade getEspecialidade() {
         return especialidade;
     }
+
     public void setEspecialidade(Especialidade especialidade) {
         this.especialidade = especialidade;
     }
@@ -78,6 +83,7 @@ public class Medico {
     public String getHora_entrada() {
         return hora_entrada;
     }
+
     public void setHora_entrada(String hora_entrada) {
         this.hora_entrada = hora_entrada;
     }
@@ -85,6 +91,7 @@ public class Medico {
     public String getHora_saida() {
         return hora_saida;
     }
+
     public void setHora_saida(String hora_saida) {
         this.hora_saida = hora_saida;
     }
@@ -92,6 +99,7 @@ public class Medico {
     public Boolean getAtivo() {
         return this.ativo;
     }
+
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }

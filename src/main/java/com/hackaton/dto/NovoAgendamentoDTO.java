@@ -8,23 +8,25 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record NovoAgendamentoDTO(
+        Long id,
         long idMedico,
         long idPaciente,
         String status,
-        @DateTimeFormat(pattern = "YYYY-MM-DD")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "YYYY-MM-DD")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         LocalDate data,
         @DateTimeFormat(pattern = "HH:mm")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         LocalTime hora
 ) {
-        public NovoAgendamentoDTO(NovoAgendamentoDTO source, StatusConfirmacao status) {
-                this(
-                        source.idMedico(),
-                        source.idPaciente(),
-                        status.getName(),
-                        source.data(),
-                        source.hora()
-                );
-        }
+    public NovoAgendamentoDTO(Long id, NovoAgendamentoDTO source, StatusConfirmacao status) {
+        this(
+                id,
+                source.idMedico(),
+                source.idPaciente(),
+                status.getName(),
+                source.data(),
+                source.hora()
+        );
+    }
 }

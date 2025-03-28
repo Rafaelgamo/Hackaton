@@ -9,8 +9,7 @@ public record AlterarMedicoDTO(
         Especialidade especialidade,
         String hora_entrada,
         String hora_saida
-)
-{
+) {
 
 }
 
