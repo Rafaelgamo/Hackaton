@@ -3,14 +3,13 @@ package com.hackaton.service;
 import com.hackaton.dto.AlterarMedicoDTO;
 import com.hackaton.dto.MedicoDTO;
 import com.hackaton.entity.Medico;
+import com.hackaton.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.hackaton.repository.MedicoRepository;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Optional;
 
@@ -22,7 +21,6 @@ public class MedicoService {
 
     @Transactional
     public Long cadastroMedico(MedicoDTO medicoDTO) {
-
         var medico = new Medico();
 
         medico.setNome(medicoDTO.nome());
@@ -43,7 +41,7 @@ public class MedicoService {
 
     @Transactional
     public Medico buscaPorId(Long id) {
-        Medico medico = medicoRepository.getReferenceById(id);
+        var medico = medicoRepository.findById(id).orElse(null);
         return medico;
     }
 
