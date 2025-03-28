@@ -3,11 +3,7 @@ package com.hackaton.dto;
 import com.hackaton.entity.Especialidade;
 import com.hackaton.entity.Medico;
 import jakarta.validation.constraints.Pattern;
-import org.apache.commons.lang3.RegExUtils;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-
-import java.sql.Time;
-import java.time.LocalTime;
 
 @EnableSpringDataWebSupport
 public record MedicoDTO(

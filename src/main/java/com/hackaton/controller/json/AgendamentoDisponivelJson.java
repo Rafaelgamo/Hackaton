@@ -6,18 +6,18 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record AgendamentoDisponivelJson (
+public record AgendamentoDisponivelJson(
         long idMedico,
         String status,
 
-        @DateTimeFormat(pattern = "YYYY-MM-DD")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate data,
 
         @DateTimeFormat(pattern = "HH:mm")
         LocalTime hora
 ) {
 
-    public AgendamentoDisponivelJson (AgendamentoDisponivelDTO agendamentoDisponivelDTO) {
+    public AgendamentoDisponivelJson(AgendamentoDisponivelDTO agendamentoDisponivelDTO) {
         this(
                 agendamentoDisponivelDTO.idMedico(),
                 agendamentoDisponivelDTO.status(),

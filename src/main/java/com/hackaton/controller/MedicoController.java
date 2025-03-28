@@ -51,7 +51,7 @@ public class MedicoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Medico> alterarPaciente(@PathVariable(name = "id") Long id,
-                                                            @RequestBody AlterarMedicoDTO alterarMedicoDTO) {
+                                                  @RequestBody AlterarMedicoDTO alterarMedicoDTO) {
         var medico = medicoService.alterarMedico(id, alterarMedicoDTO);
         return ResponseEntity.ok(medico.getBody());
     }
