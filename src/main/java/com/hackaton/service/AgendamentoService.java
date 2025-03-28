@@ -113,6 +113,8 @@ public class AgendamentoService {
             retorno = realizarAgendamento(retornoNovoAgendamentoDTO);
         }
 
+        agendamentoRepository.save(agendamentoConcluido);
+
         return new AgendamentoConcluidoDTO(
             new AgendamentoDTO(agendamentoConcluido),
             retorno == null ? null : new AgendamentoDTO(retorno)
