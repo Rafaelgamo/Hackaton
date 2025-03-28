@@ -22,6 +22,7 @@ import java.util.Set;
 @RequestMapping("/agendamento")
 public class AgendamentoController {
 
+
     private final AgendamentoService agendamentoService;
 
     public AgendamentoController(AgendamentoService agendamentoService) {
