@@ -1,4 +1,4 @@
-package com.hackaton.controller;
+package com.hackaton.controller.json;
 
 import com.hackaton.dto.AgendamentoDisponivelDTO;
 import org.springframework.format.annotation.DateTimeFormat;

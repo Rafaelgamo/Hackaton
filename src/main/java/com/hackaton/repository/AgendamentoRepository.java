@@ -1,7 +1,6 @@
 package com.hackaton.repository;
 
 import com.hackaton.entity.Agendamento;
-import com.hackaton.entity.StatusConfirmacao;
 import com.hackaton.entity.StatusConfirmacaoConstants;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

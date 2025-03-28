@@ -2,8 +2,8 @@ package com.hackaton.service;
 
 import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.AgendamentoDisponivelDTO;
+import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.entity.Agendamento;
-import com.hackaton.entity.Medico;
 import com.hackaton.entity.Paciente;
 import com.hackaton.entity.StatusConfirmacao;
 import com.hackaton.repository.AgendamentoRepository;
@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +25,7 @@ public class AgendamentoService {
     private final AgendamentoRepository agendamentoRepository;
     private final EmailService emailService;
     private final PacienteService pacienteService;
+    private final MedicoService medicoService;
 
     @Value("${application.baseurl}")
     private String baseUrl;
@@ -51,9 +50,11 @@ public class AgendamentoService {
                 LocalTime.parse("17:30")
             ));
 
-    public AgendamentoService(AgendamentoRepository agendamentoRepository, EmailService emailService) {
+    public AgendamentoService(AgendamentoRepository agendamentoRepository, EmailService emailService, PacienteService pacienteService, MedicoService medicoService) {
         this.agendamentoRepository = agendamentoRepository;
         this.emailService = emailService;
+        this.pacienteService = pacienteService;
+        this.medicoService = medicoService;
     }
 
     public void enviarEmailConfirmação(AgendamentoDTO agendamentoDTO) {
@@ -80,19 +81,54 @@ public class AgendamentoService {
         return null;
     }
 
-    public AgendamentoDTO realizarAgendamento(AgendamentoDTO agendamentoDTO) {
+    public NovoAgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
+        var medicoId = agendamentoDTO.idMedico();
+        var pacienteId = agendamentoDTO.idPaciente();
         var novoAgendamento = new Agendamento();
-        novoAgendamento.setMedico(new Medico(agendamentoDTO.idMedico()));
-        novoAgendamento.setPaciente(new Paciente(agendamentoDTO.idPaciente()));
 
-        novoAgendamento.setStatus();
+        var data = agendamentoDTO.data();
+        if (data.isBefore(LocalDate.now())) {
+            throw new RuntimeException("Data inválida, insira a data de hoje ou uma futura");
+        }
+
+        var hora = agendamentoDTO.hora();
+        if (!horariosDisponiveisPorPadrao.contains(hora)) {
+            throw new RuntimeException("'hora' inválida, cheque a lista de horarios disponiveis");
+        }
+
+        if (data.equals(LocalDate.now())) {
+            if (hora.isBefore(LocalTime.now())) {
+                throw new RuntimeException("Data inválida, insira data e hora futuras");
+            }
+        }
+
+        var agendamentoConflitante = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
+        if (agendamentoConflitante != null) {
+            throw new RuntimeException("Horário está indisponível para este médico");
+        }
+
+        var medico = medicoService.buscaPorId(medicoId);
+        if (medico == null) {
+            throw new RuntimeException("Medico inexistente");
+        }
+
+        var paciente = pacienteService.buscarPacientePorId(pacienteId);
+        if (paciente == null) {
+            throw new RuntimeException("Paciente inexistente");
+        }
+
+        novoAgendamento.setMedico(medico);
+        novoAgendamento.setPaciente(new Paciente(pacienteId));
+        novoAgendamento.setStatus(StatusConfirmacao.AGENDADO);
+        novoAgendamento.setData(data);
+        novoAgendamento.setHora(hora);
 
         agendamentoRepository.save(novoAgendamento);
 
-        return agendamentoDTO;
+        return new NovoAgendamentoDTO(agendamentoDTO, StatusConfirmacao.AGENDADO);
     }
 
-    public void atualizarStatusAgendamento(Long medicoId, LocalDate data, LocalTime hora, StatusConfirmacao novoStatus) {
+    public void atualizarStatusAgendamento(Long medicoId, Long pacienteId, LocalDate data, LocalTime hora, StatusConfirmacao novoStatus) {
         Agendamento agendamento = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
         if (agendamento == null) {
             // TODO Exception
@@ -113,7 +149,14 @@ public class AgendamentoService {
         var agendamentosOcupados = agendamentoRepository.listarMarcadosPorDataEMedico(data, medicoId);
         var horariosOcupados = agendamentosOcupados.stream().map(Agendamento::getHora).collect(Collectors.toSet());
 
+        var hoje = LocalDate.now();
+        var agora = LocalTime.now();
         for (var horarioDisponivelPorPadrao : horariosDisponiveisPorPadrao) {
+            // Filtrando horários passados
+            if (hoje.equals(data) && horarioDisponivelPorPadrao.isBefore(agora)) {
+                continue;
+            }
+
             if (!horariosOcupados.contains(horarioDisponivelPorPadrao)) {
                 var horarioDisponivelDTO = new AgendamentoDisponivelDTO(
                         medicoId,

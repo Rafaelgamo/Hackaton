@@ -1,22 +1,19 @@
 package com.hackaton.controller;
 
-import com.hackaton.dto.MarcacaoDTO;
+import com.hackaton.controller.json.AgendamentoDisponivelJson;
+import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.service.AgendamentoService;
-import jakarta.persistence.TemporalType;
-import jakarta.validation.constraints.Pattern;
-import org.springframework.data.repository.query.Param;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoField;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/agendamento")
@@ -29,8 +26,9 @@ public class AgendamentoController {
     }
 
     @PostMapping("/marcar")
-    public ResponseEntity<Void> realizarAgendamento(MarcacaoDTO marcacaoDTO) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<NovoAgendamentoDTO> realizarAgendamento(@RequestBody @Valid NovoAgendamentoDTO novoAgendamentoDTO) {
+        var horarioAgendado = agendamentoService.realizarAgendamento(novoAgendamentoDTO);
+        return ResponseEntity.ok(horarioAgendado);
     }
 
     @GetMapping("/disponiveis")
