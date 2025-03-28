@@ -1,6 +1,7 @@
 package com.hackaton.controller;
 
 import com.hackaton.controller.json.AgendamentoDisponivelJson;
+import com.hackaton.controller.json.NovoAgendamentoJson;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.service.AgendamentoService;
 import jakarta.validation.Valid;
@@ -19,7 +20,6 @@ import java.util.List;
 @RequestMapping("/agendamento")
 public class AgendamentoController {
 
-
     private final AgendamentoService agendamentoService;
 
     public AgendamentoController(AgendamentoService agendamentoService) {
@@ -27,19 +27,17 @@ public class AgendamentoController {
     }
 
     @PostMapping("/marcar")
-    public ResponseEntity<NovoAgendamentoDTO> realizarAgendamento(@RequestBody @Valid NovoAgendamentoDTO novoAgendamentoDTO) {
-        var horarioAgendado = agendamentoService.realizarAgendamento(novoAgendamentoDTO);
+    public ResponseEntity<NovoAgendamentoDTO> realizarAgendamento(@RequestBody @Valid NovoAgendamentoJson novoAgendamentoJson) {
+        var horarioAgendado = agendamentoService.realizarAgendamento(novoAgendamentoJson.toDTO());
         return ResponseEntity.ok(horarioAgendado);
     }
 
     @GetMapping("/disponiveis")
     public ResponseEntity<List<AgendamentoDisponivelJson>> listarHorariosDisponiveisPorDiaEMedico(
         @RequestParam("medicoId") Long medicoId,
-
-        @RequestParam(value = "data")
 //        @Pattern(regexp = "[1-2]\\d{3}-[0-1]?\\d-[0-3]?\\d", message = "A 'data' deve estar no padrão YYYY-MM-DD.")
+        @RequestParam("data")
         String data
-
     ) {
         var localDateData = LocalDate.parse(data);
 
@@ -50,9 +48,7 @@ public class AgendamentoController {
     }
 
     @GetMapping("/disponiveis/hoje")
-    public ResponseEntity listarHorariosDisponiveisPorDia(
-            @RequestParam Long medicoId
-    ) {
+    public ResponseEntity<List<AgendamentoDisponivelJson>> listarHorariosDisponiveisPorDia(@RequestParam Long medicoId) {
         var localDateData = LocalDate.now();
 
         var disponiveisDTOs = agendamentoService.listarHorariosDisponiveisPorDiaEMedico(localDateData, medicoId);

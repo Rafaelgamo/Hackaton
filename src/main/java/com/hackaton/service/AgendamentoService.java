@@ -113,7 +113,7 @@ public class AgendamentoService {
             throw new RuntimeException("Medico inexistente");
         }
 
-        var paciente = pacienteService.buscarPacientePorId(pacienteId);
+        var paciente = pacienteService.buscarPorId(pacienteId);
         if (paciente == null) {
             throw new RuntimeException("Paciente inexistente");
         }
