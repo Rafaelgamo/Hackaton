@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/agendamento")
 public class AgendamentoController {
 
+
     private final AgendamentoService agendamentoService;
 
     public AgendamentoController(AgendamentoService agendamentoService) {

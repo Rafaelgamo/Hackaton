@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class AgendamentoService {
 
     private final AgendamentoRepository agendamentoRepository;
+  
     private final EmailService emailService;
     private final PacienteService pacienteService;
     private final MedicoService medicoService;
