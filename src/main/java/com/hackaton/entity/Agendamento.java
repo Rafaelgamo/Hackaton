@@ -1,5 +1,6 @@
 package com.hackaton.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -13,7 +14,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "agendamento")
@@ -34,18 +36,24 @@ public class Agendamento {
     private Boolean ehUltimoDoDia;
 
     @Enumerated(EnumType.STRING)
-    private StatusConfirmacao statusConfirmacao;
+    private StatusConfirmacao status;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Instant dataHora;
+    @Column(name = "data", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private LocalDate data;
 
-    public Agendamento(Long id, Paciente paciente, Medico medico, Boolean ehUltimoDoDia, StatusConfirmacao statusConfirmacao, Instant dataHora) {
+    @Column(name = "hora", nullable = false)
+    @Temporal(TemporalType.TIME)
+    private LocalTime hora;
+
+    public Agendamento(Long id, Paciente paciente, Medico medico, Boolean ehUltimoDoDia, StatusConfirmacao status, LocalDate data, LocalTime hora) {
         this.id = id;
         this.paciente = paciente;
         this.medico = medico;
         this.ehUltimoDoDia = ehUltimoDoDia;
-        this.statusConfirmacao = statusConfirmacao;
-        this.dataHora = dataHora;
+        this.status = status;
+        this.data = data;
+        this.hora = hora;
     }
 
     public Agendamento() {
@@ -83,19 +91,27 @@ public class Agendamento {
         this.ehUltimoDoDia = ehUltimoDoDia;
     }
 
-    public StatusConfirmacao getStatusConfirmacao() {
-        return statusConfirmacao;
+    public StatusConfirmacao getStatus() {
+        return status;
     }
 
-    public void setStatusConfirmacao(StatusConfirmacao statusConfirmacao) {
-        this.statusConfirmacao = statusConfirmacao;
+    public void setStatus(StatusConfirmacao statusConfirmacao) {
+        this.status = statusConfirmacao;
     }
 
-    public Instant getDataHora() {
-        return dataHora;
+    public LocalDate getData() {
+        return data;
     }
 
-    public void setDataHora(Instant dataHora) {
-        this.dataHora = dataHora;
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
+
+    public LocalTime getHora() {
+        return hora;
+    }
+
+    public void setHora(LocalTime hora) {
+        this.hora = hora;
     }
 }
