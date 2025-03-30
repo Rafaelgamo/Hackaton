@@ -29,7 +29,15 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
             "       and a.hora = :hora")
     Agendamento buscarAgendamento(Long medicoId, LocalDate data, LocalTime hora);
 
+    @Query("from Agendamento a" +
+        "       inner join fetch a.medico" +
+        "       inner join fetch a.paciente" +
+        "   where a.data between :inicio and :fim" +
+        "       and a.status = " + StatusConfirmacaoConstants.AGENDADO)
+    List<Agendamento> listarAgendadosPorDataEntre(LocalDate inicio, LocalDate fim);
+
     List<Agendamento> findAllByPaciente(Paciente paciente);
 
     List<Agendamento> findAllByMedico(Medico medico);
+
 }
