@@ -6,6 +6,7 @@ import com.hackaton.controller.json.NovoAgendamentoJson;
 import com.hackaton.dto.AgendamentoConcluidoDTO;
 import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.NovoAgendamentoDTO;
+import com.hackaton.entity.StatusConfirmacao;
 import com.hackaton.service.AgendamentoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
@@ -50,11 +51,37 @@ public class AgendamentoController {
 
     @PostMapping("/concluir/{idAgendamento}")
     public ResponseEntity<AgendamentoConcluidoDTO> concluirAgendamento(
-            @PathVariable Long idAgendamento,
-            @RequestBody ConcluirAgendamentoJson concluirAgendamentoJson
+        @PathVariable Long idAgendamento,
+        @RequestBody ConcluirAgendamentoJson concluirAgendamentoJson
     ) {
         var conclusaoAgendamentoDTO = agendamentoService.concluirAgendamento(idAgendamento, concluirAgendamentoJson.toDTO());
         return ResponseEntity.ok(conclusaoAgendamentoDTO);
+    }
+
+    @PostMapping("/confirmar/{idAgendamento}")
+    public ResponseEntity<AgendamentoDTO> postConfirmarAgendamento(@PathVariable Long idAgendamento) {
+        var conclusaoAgendamentoDTO = agendamentoService.atualizarStatusAgendamento(idAgendamento, StatusConfirmacao.CONFIRMADO);
+        return ResponseEntity.ok(conclusaoAgendamentoDTO);
+    }
+
+    @GetMapping("/confirmar/{idAgendamento}")
+    public ResponseEntity<String> getConfirmarAgendamento(@PathVariable Long idAgendamento) {
+        postConfirmarAgendamento(idAgendamento);
+        return ResponseEntity.ok("<h3>Sua consulta foi confirmada, obrigado!</h3>" +
+            "Você já pode fechar esta aba.");
+    }
+
+    @PostMapping("/cancelar/{idAgendamento}")
+    public ResponseEntity<AgendamentoDTO> postCancelarAgendamento(@PathVariable Long idAgendamento) {
+        var conclusaoAgendamentoDTO = agendamentoService.atualizarStatusAgendamento(idAgendamento, StatusConfirmacao.CANCELADO);
+        return ResponseEntity.ok(conclusaoAgendamentoDTO);
+    }
+
+    @GetMapping("/cancelar/{idAgendamento}")
+    public ResponseEntity<String> getCancelarAgendamento(@PathVariable Long idAgendamento) {
+        postCancelarAgendamento(idAgendamento);
+        return ResponseEntity.ok("<h3>Sua consulta foi cancelada, obrigado!</h3>" +
+            "Se precisar de ajuda, entre em contato para remarcarmos.</br></br>Você já pode fechar esta aba.");
     }
 
     @GetMapping("/disponiveis")
@@ -92,9 +119,4 @@ public class AgendamentoController {
         return ResponseEntity.ok(porPaciente);
     }
 
-    @PostMapping("/email")
-    public ResponseEntity<Void> enviarEmailConfirmacao() {
-        agendamentoService.enviarEmailConfirmação(null);
-        return ResponseEntity.ok().build();
-    }
 }

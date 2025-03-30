@@ -48,7 +48,7 @@ public class EmailService {
 
             mailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao enviar email - destino={}", toEmail, e);
         }
     }
 

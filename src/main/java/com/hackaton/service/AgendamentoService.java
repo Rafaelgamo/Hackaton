@@ -66,10 +66,6 @@ public class AgendamentoService {
         this.medicoService = medicoService;
     }
 
-    public List<Long> listarPassiveisDeEnvioDeEmailDeConfirmacao() {
-        return null;
-    }
-
     // TODO: MVP - Esse método permite que agendamentos com data maior do que a atual seja concluído para facilitar os testes desta POC
     public AgendamentoConcluidoDTO concluirAgendamento(Long agendamentoId, ConcluirAgendamentoDTO concluirAgendamentoDTO) {
         var optById = agendamentoRepository.findById(agendamentoId);
@@ -91,6 +87,20 @@ public class AgendamentoService {
             new AgendamentoDTO(agendamentoConcluido),
             retorno == null ? null : new AgendamentoDTO(retorno)
         );
+    }
+
+    public AgendamentoDTO atualizarStatusAgendamento(Long idAgendamento, StatusConfirmacao status) {
+        var optById = agendamentoRepository.findById(idAgendamento);
+        if (optById.isEmpty()) {
+            throw new NaoEncontradoException("Agendamento não existente");
+        }
+
+        var agendamento = optById.get();
+        agendamento.setStatus(status);
+
+        agendamentoRepository.save(agendamento);
+
+        return new AgendamentoDTO(agendamento);
     }
 
     public NovoAgendamentoDTO agendarRetorno(Long agendamentoId, LocalDate novaData) {
@@ -187,31 +197,14 @@ public class AgendamentoService {
         return realizarAgendamento(retornoNovoAgendamentoDTO);
     }
 
-    private boolean ehDataHoraValida(LocalDate data, LocalTime hora) {
-        if (!ehDataValida(data)) {
-            return false;
+    public List<Agendamento> listarAgendamentosProximos(Integer rangeDias) {
+        if (rangeDias <= 0) {
+            throw new ValidacaoException("O rangeDias deve ser um numero inteiro positivo");
         }
 
-        if (!ehHoraValida(hora)) {
-            return false;
-        }
-
-        if (data.equals(LocalDate.now())) {
-            if (hora.isBefore(LocalTime.now())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void atualizarStatusAgendamento(Long medicoId, Long pacienteId, LocalDate data, LocalTime hora, StatusConfirmacao novoStatus) {
-        Agendamento agendamento = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
-        if (agendamento == null) {
-            throw new NaoEncontradoException("Agendamento não encontrado, medicoId=" + medicoId + ", data=" + data + ", hora=" + hora);
-        }
-
-        agendamento.setStatus(novoStatus);
+        var hoje = LocalDate.now();
+        var dataLimite = hoje.plusDays(rangeDias);
+        return agendamentoRepository.listarAgendadosPorDataEntre(hoje, dataLimite);
     }
 
     public List<AgendamentoDisponivelDTO> listarHorariosDisponiveisPorDiaEMedico(LocalDate data, Long medicoId) {
@@ -257,24 +250,69 @@ public class AgendamentoService {
         return agendamentoRepository.findAllByMedico(medico).stream().map(AgendamentoDTO::new).toList();
     }
 
-    public void enviarEmailConfirmação(AgendamentoDTO agendamentoDTO) {
+    public void contatarPacientesParaConfirmacao(List<Agendamento> agendamentosProximos) {
+        for (var agendamento : agendamentosProximos) {
+            var paciente = agendamento.getPaciente();
+
+            var emailPaciente = paciente.getEmail();
+            if (emailPaciente == null) {
+                agendamento.setStatus(StatusConfirmacao.SEM_CONTATO_ELETRONICO);
+                continue;
+            }
+
+            var medico = agendamento.getMedico();
+
+            agendamento.setStatus(StatusConfirmacao.AGUARDANDO_CONFIRMACAO);
+
+            enviarEmailConfirmacao(
+                agendamento.getId(),
+                paciente.getNome(),
+                emailPaciente,
+                agendamento.getData(),
+                agendamento.getHora(),
+                medico.getEspecialidade().getNome()
+            );
+        }
+
+        agendamentoRepository.saveAll(agendamentosProximos);
+    }
+
+    public void enviarEmailConfirmacao(Long agendamentoId, String nomePaciente, String emailPaciente, LocalDate data, LocalTime hora, String especialidade) {
         var template = EmailTemplates.TEMPLATE_CONFIRMACAO;
 
         var properties = new HashMap<String, Object>();
-        properties.put("nomePaciente", "Eu mesmo");
-        properties.put("dataAgendamento", "25/03/2025");
-        properties.put("horaAgendamento", "14:30");
-        properties.put("especialidade", "Clinico Geral");
+        properties.put("nomePaciente", nomePaciente);
+        properties.put("dataAgendamento", data);
+        properties.put("horaAgendamento", hora);
+        properties.put("especialidade", especialidade);
 
-        properties.put("urlConfirmar", baseUrl + "/confirmar/" + 5);
-        properties.put("urlCancelar", baseUrl + "/cancelar/" + 5);
+        properties.put("urlConfirmar", baseUrl + "/agendamento/confirmar/" + agendamentoId);
+        properties.put("urlCancelar", baseUrl + "/agendamento/cancelar/" + agendamentoId);
 
         emailService.sendEmail(
-                template.getTemplate(),
-                "caioalves_diogo@hotmail.com",
-                template.getTitulo(),
-                properties
+            template.getTemplate(),
+            emailPaciente,
+            template.getTitulo(),
+            properties
         );
+    }
+
+    private boolean ehDataHoraValida(LocalDate data, LocalTime hora) {
+        if (!ehDataValida(data)) {
+            return false;
+        }
+
+        if (!ehHoraValida(hora)) {
+            return false;
+        }
+
+        if (data.equals(LocalDate.now())) {
+            if (hora.isBefore(LocalTime.now())) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private boolean ehHoraValida(LocalTime hora) {
