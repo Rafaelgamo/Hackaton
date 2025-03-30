@@ -9,6 +9,9 @@ import com.hackaton.entity.Agendamento;
 import com.hackaton.entity.Medico;
 import com.hackaton.entity.Paciente;
 import com.hackaton.entity.StatusConfirmacao;
+import com.hackaton.exception.ConflitoException;
+import com.hackaton.exception.NaoEncontradoException;
+import com.hackaton.exception.ValidacaoException;
 import com.hackaton.repository.AgendamentoRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -71,7 +74,7 @@ public class AgendamentoService {
     public AgendamentoConcluidoDTO concluirAgendamento(Long agendamentoId, ConcluirAgendamentoDTO concluirAgendamentoDTO) {
         var optById = agendamentoRepository.findById(agendamentoId);
         if (optById.isEmpty()) {
-            throw new RuntimeException("Agendamento não existente");
+            throw new NaoEncontradoException("Agendamento não existente");
         }
 
         var agendamentoConcluido = optById.get();
@@ -90,16 +93,74 @@ public class AgendamentoService {
         );
     }
 
+    public NovoAgendamentoDTO agendarRetorno(Long agendamentoId, LocalDate novaData) {
+        var optById = agendamentoRepository.findById(agendamentoId);
+        if (optById.isEmpty()) {
+            throw new NaoEncontradoException("Agendamento não existente");
+        }
+
+        if (!ehDataValida(novaData)) {
+            throw new ValidacaoException("Data inválida, verifique os horarios disponíveis para este dia");
+        }
+
+        var agendamento = optById.get();
+        var medicoId = agendamento.getMedico().getId();
+        var pacienteId = agendamento.getPaciente().getId();
+
+        var novaHora = agendamento.getHora();
+        return agendarRetorno(medicoId, pacienteId, novaData, novaHora);
+    }
+
     public NovoAgendamentoDTO agendarRetorno(Agendamento agendamentoConcluido, Long diasParaRetorno) {
         var medicoId = agendamentoConcluido.getMedico().getId();
         var pacienteId = agendamentoConcluido.getPaciente().getId();
 
         var novaData = LocalDate.now().plusDays(diasParaRetorno);
         var novaHora = agendamentoConcluido.getHora();
+        return agendarRetorno(medicoId, pacienteId, novaData, novaHora);
+    }
 
+    public NovoAgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
+        var medicoId = agendamentoDTO.idMedico();
+        var pacienteId = agendamentoDTO.idPaciente();
+        var novoAgendamento = new Agendamento();
+
+        var data = agendamentoDTO.data();
+        var hora = agendamentoDTO.hora();
+        if (!ehDataHoraValida(data, hora)) {
+            throw new ValidacaoException("Data ou hora inválidos, verifique os horarios disponíveis para este dia");
+        }
+
+        var agendamentoConflitante = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
+        if (agendamentoConflitante != null) {
+            throw new ValidacaoException("Data ou hora inválidos, verifique os horarios disponíveis para este dia");
+        }
+
+        var medico = medicoService.buscaPorId(medicoId);
+        if (medico == null) {
+            throw new NaoEncontradoException("Medico inexistente");
+        }
+
+        var paciente = pacienteService.buscarPorId(pacienteId);
+        if (paciente == null) {
+            throw new NaoEncontradoException("Paciente inexistente");
+        }
+
+        novoAgendamento.setMedico(medico);
+        novoAgendamento.setPaciente(new Paciente(pacienteId));
+        novoAgendamento.setStatus(StatusConfirmacao.AGENDADO);
+        novoAgendamento.setData(data);
+        novoAgendamento.setHora(hora);
+
+        var agendamentoSalvo = agendamentoRepository.save(novoAgendamento);
+
+        return new NovoAgendamentoDTO(agendamentoSalvo.getId(), agendamentoDTO, agendamentoSalvo.getStatus());
+    }
+
+    private NovoAgendamentoDTO agendarRetorno(Long medicoId, Long pacienteId, LocalDate novaData, LocalTime novaHora) {
         var horariosDisponiveisNaData = listarHorariosDisponiveisPorDiaEMedico(novaData, medicoId);
         if (horariosDisponiveisNaData.isEmpty()) {
-            throw new RuntimeException("Médico indisponível na data do retorno - " + novaData);
+            throw new ConflitoException("Médico indisponível na data do retorno - " + novaData);
         }
 
         boolean horaDaConsultaLivre = false;
@@ -126,59 +187,28 @@ public class AgendamentoService {
         return realizarAgendamento(retornoNovoAgendamentoDTO);
     }
 
-    public NovoAgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
-        var medicoId = agendamentoDTO.idMedico();
-        var pacienteId = agendamentoDTO.idPaciente();
-        var novoAgendamento = new Agendamento();
-
-        var data = agendamentoDTO.data();
-        if (data.isBefore(LocalDate.now())) {
-            throw new RuntimeException("Data inválida, insira a data de hoje ou uma futura");
+    private boolean ehDataHoraValida(LocalDate data, LocalTime hora) {
+        if (!ehDataValida(data)) {
+            return false;
         }
 
-        var hora = agendamentoDTO.hora();
-        if (!HORARIOS_DISPONIVEIS_POR_PADRAO.contains(hora)) {
-            throw new RuntimeException("'hora' inválida, cheque a lista de horarios disponiveis");
+        if (!ehHoraValida(hora)) {
+            return false;
         }
 
         if (data.equals(LocalDate.now())) {
             if (hora.isBefore(LocalTime.now())) {
-                throw new RuntimeException("Data inválida, insira data e hora futuras");
+                return false;
             }
         }
 
-        var agendamentoConflitante = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
-        if (agendamentoConflitante != null) {
-            throw new RuntimeException("Horário está indisponível para este médico");
-        }
-
-        var medico = medicoService.buscaPorId(medicoId);
-        if (medico == null) {
-            throw new RuntimeException("Medico inexistente");
-        }
-
-        var paciente = pacienteService.buscarPorId(pacienteId);
-        if (paciente == null) {
-            throw new RuntimeException("Paciente inexistente");
-        }
-
-        novoAgendamento.setMedico(medico);
-        novoAgendamento.setPaciente(new Paciente(pacienteId));
-        novoAgendamento.setStatus(StatusConfirmacao.AGENDADO);
-        novoAgendamento.setData(data);
-        novoAgendamento.setHora(hora);
-
-        var agendamentoSalvo = agendamentoRepository.save(novoAgendamento);
-
-        return new NovoAgendamentoDTO(agendamentoSalvo.getId(), agendamentoDTO, agendamentoSalvo.getStatus());
+        return true;
     }
 
     public void atualizarStatusAgendamento(Long medicoId, Long pacienteId, LocalDate data, LocalTime hora, StatusConfirmacao novoStatus) {
         Agendamento agendamento = agendamentoRepository.buscarAgendamento(medicoId, data, hora);
         if (agendamento == null) {
-            // TODO Exception
-            //throw new AgendamentoNaoEncontradoException
-            return;
+            throw new NaoEncontradoException("Agendamento não encontrado, medicoId=" + medicoId + ", data=" + data + ", hora=" + hora);
         }
 
         agendamento.setStatus(novoStatus);
@@ -247,4 +277,11 @@ public class AgendamentoService {
         );
     }
 
+    private boolean ehHoraValida(LocalTime hora) {
+        return HORARIOS_DISPONIVEIS_POR_PADRAO.contains(hora);
+    }
+
+    private boolean ehDataValida(LocalDate data) {
+        return LocalDate.now().isBefore(data);
+    }
 }

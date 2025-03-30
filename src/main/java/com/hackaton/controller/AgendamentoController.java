@@ -8,7 +8,7 @@ import com.hackaton.dto.AgendamentoDTO;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.service.AgendamentoService;
 import jakarta.validation.Valid;
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +37,17 @@ public class AgendamentoController {
         return ResponseEntity.ok(horarioAgendado);
     }
 
+    @PostMapping("/marcar/retorno")
+    public ResponseEntity<NovoAgendamentoDTO> agendarRetorno(
+        @RequestParam Long idAgendamento,
+        @Pattern(regexp = "[1-2]\\d{3}-[0-3]?\\d-[0-3]?\\d", message = "Formato data: yyyy-MM-dd") @RequestParam("data") String data
+    ) {
+        var localDateData = LocalDate.parse(data);
+
+        var novoAgendamentoDTO = agendamentoService.agendarRetorno(idAgendamento, localDateData);
+        return ResponseEntity.ok(novoAgendamentoDTO);
+    }
+
     @PostMapping("/concluir/{idAgendamento}")
     public ResponseEntity<AgendamentoConcluidoDTO> concluirAgendamento(
             @PathVariable Long idAgendamento,
@@ -49,7 +60,7 @@ public class AgendamentoController {
     @GetMapping("/disponiveis")
     public ResponseEntity<List<AgendamentoDisponivelJson>> listarHorariosDisponiveisPorDiaEMedico(
             @RequestParam("medicoId") Long medicoId,
-            @DateTimeFormat(pattern = "HH:mm") @RequestParam("data") String data
+            @Pattern(regexp = "[1-2]\\d{3}-[0-3]?\\d-[0-3]?\\d", message = "Formato data: yyyy-MM-dd") @RequestParam("data") String data
     ) {
         var localDateData = LocalDate.parse(data);
 
