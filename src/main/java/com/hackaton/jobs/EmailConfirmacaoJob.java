@@ -6,8 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.TimeUnit;
-
 @Component
 public class EmailConfirmacaoJob {
 
@@ -20,12 +18,14 @@ public class EmailConfirmacaoJob {
 
     // Job rodando todos os dias às 10:00
     @Scheduled(cron = "0 0 10 * * *", zone = "America/Recife")
+//    @Scheduled(cron = "0 */10 * * * *", zone = "America/Recife")
     public void enviarEmailConfirmacao() {
-        logger.info("JOB - Envio de email de confirmação - Iniciado");
-//        var agendamentosAplicaveis = agendamentoService.listarAgendamentosPorProximidadeDeData(5, TimeUnit.DAYS);
-//        agendamentoService.enviarEmailConfirmação(null);
+        logger.info("Envio de email de confirmação - Iniciado");
+        var agendamentosProximos = agendamentoService.listarAgendamentosProximos(5);
 
-        logger.info("JOB - Envio de email de confirmação - Encerrado");
+        agendamentoService.contatarPacientesParaConfirmacao(agendamentosProximos);
+
+        logger.info("Envio de email de confirmação - Encerrado - {} agendamentos processados", agendamentosProximos.size());
     }
 
 }

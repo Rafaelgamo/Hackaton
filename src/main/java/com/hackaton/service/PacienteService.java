@@ -2,6 +2,7 @@ package com.hackaton.service;
 
 import com.hackaton.dto.PacienteDTO;
 import com.hackaton.entity.Paciente;
+import com.hackaton.exception.ConflitoException;
 import com.hackaton.repository.PacienteRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,7 +37,7 @@ public class PacienteService {
     public void cadastroPaciente(PacienteDTO pacienteDTO) {
         var pacienteComCPF = pacienteRepository.findByCpf(pacienteDTO.cpf());
         if (pacienteComCPF != null) {
-            throw new RuntimeException("CPF já cadastrado");
+            throw new ConflitoException("CPF já cadastrado");
         }
 
         var novoPaciente = new Paciente();

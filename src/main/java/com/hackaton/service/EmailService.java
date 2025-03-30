@@ -1,6 +1,5 @@
 package com.hackaton.service;
 
-import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +48,7 @@ public class EmailService {
 
             mailSender.send(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Erro ao enviar email - destino={}", toEmail, e);
         }
     }
 
