@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class PacienteService {
@@ -43,6 +45,9 @@ public class PacienteService {
             throw new ConflitoException("CPF já cadastrado");
         }
 
+        if (!isValidEmail(pacienteDTO.email())){
+            throw new IllegalArgumentException("Email inválido");
+        }
         var novoPaciente = new Paciente();
         novoPaciente.setNome(pacienteDTO.nome());
         novoPaciente.setCpf(pacienteDTO.cpf());
@@ -52,7 +57,13 @@ public class PacienteService {
 
         pacienteRepository.save(novoPaciente);
     }
+    private boolean isValidEmail(String email) {
+        String regex  = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
 
+    }
     public void removerPaciente(Long id) {
 
         if (!pacienteRepository.existsById(id)) {
