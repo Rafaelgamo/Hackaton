@@ -56,10 +56,10 @@ public class PacienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Paciente> alterarPaciente(@PathVariable(name = "id") Long id
-//                                                    @RequestBody AlterarPacienteDTO alterarPacienteDTO
+    public ResponseEntity<Paciente> alterarPaciente(@PathVariable(name = "id") Long id,
+                                                    @RequestBody PacienteDTO alterarPacienteDTO
     ) {
-//      TODO: var paciente = pacienteService.alterarPaciente(id, alterarPacienteDTO);
-        return ResponseEntity.ok().build();
+        var paciente = pacienteService.alteraPaciente(alterarPacienteDTO);
+        return ResponseEntity.ok(paciente);
     }
 }

@@ -211,7 +211,7 @@ public class AgendamentoService {
         var horariosDisponiveis = new ArrayList<AgendamentoDisponivelDTO>();
 
         if (data.isBefore(LocalDate.now())) {
-            throw new RuntimeException("Data inválida, insira a data de hoje ou uma futura");
+            throw new ValidacaoException("Data inválida, insira a data de hoje ou uma futura");
         }
 
         var agendamentosOcupados = agendamentoRepository.listarMarcadosPorDataEMedico(data, medicoId);

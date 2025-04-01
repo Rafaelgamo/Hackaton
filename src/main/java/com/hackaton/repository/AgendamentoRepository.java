@@ -18,7 +18,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     @Query("from Agendamento a " +
             "   where a.data = :data and a.medico.id = :medicoId" +
-            "       and a.status != " + StatusConfirmacaoConstants.DISPONIVEL +
             "       and a.status != " + StatusConfirmacaoConstants.CANCELADO +
             "   order by a.data, a.hora")
     Set<Agendamento> listarMarcadosPorDataEMedico(LocalDate data, Long medicoId);
