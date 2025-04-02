@@ -50,7 +50,7 @@ public class RetornoSUSExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity handleException(Exception ex) {
         log.error("Erro Interno - ", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error("Erro Interno, vefirique os logs da aplicação"));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Error("Erro Interno, verifique os logs da aplicação"));
     }
 
 	private record Error (Integer errorCode, String message) {

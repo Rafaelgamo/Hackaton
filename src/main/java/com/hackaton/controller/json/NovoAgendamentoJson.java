@@ -1,6 +1,7 @@
 package com.hackaton.controller.json;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hackaton.dto.NovoAgendamentoDTO;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -13,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 public record NovoAgendamentoJson(
         @NotNull @Positive Long idMedico,
         @NotNull @Positive Long idPaciente,
-        String status,
+        @JsonIgnore String status,
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         String data,

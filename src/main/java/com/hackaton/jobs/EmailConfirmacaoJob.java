@@ -18,7 +18,6 @@ public class EmailConfirmacaoJob {
 
     // Job rodando todos os dias às 10:00
     @Scheduled(cron = "0 0 10 * * *", zone = "America/Recife")
-//    @Scheduled(cron = "0 */10 * * * *", zone = "America/Recife")
     public void enviarEmailConfirmacao() {
         logger.info("Envio de email de confirmação - Iniciado");
         var agendamentosProximos = agendamentoService.listarAgendamentosProximos(5);

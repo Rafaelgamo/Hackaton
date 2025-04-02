@@ -3,6 +3,8 @@ package com.hackaton.service;
 import com.hackaton.dto.PacienteDTO;
 import com.hackaton.entity.Paciente;
 import com.hackaton.exception.ConflitoException;
+import com.hackaton.exception.NaoEncontradoException;
+import com.hackaton.exception.ValidacaoException;
 import com.hackaton.repository.PacienteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +49,11 @@ public class PacienteService {
         }
 
         if (!isValidEmail(pacienteDTO.email())) {
-            throw new IllegalArgumentException("Email inválido");
+            throw new ValidacaoException("Email inválido");
         }
 
         if (!isValidCPF(pacienteDTO.cpf())) {
-            throw new IllegalArgumentException("CPF inválido");
+            throw new ValidacaoException("CPF inválido");
         }
 
         var novoPaciente = new Paciente();
@@ -109,32 +111,32 @@ public class PacienteService {
         // Verificar se os dois dígitos verificadores calculados são iguais aos fornecidos
         return cpf.charAt(9) == (digito1 + '0') && cpf.charAt(10) == (digito2 + '0');
     }
-        public void removerPaciente (Long id){
 
-            if (!pacienteRepository.existsById(id)) {
-                throw new IllegalArgumentException("Paciente não encontrado.");
-            }
-            try {
-                pacienteRepository.deleteById(id);
-                log.info("Paciente com id {} removido com sucesso", id);
-            } catch (Exception e) {
-                log.error("Erro ao remover paciente com id {}: {}", id, e.getMessage());
-                throw new RuntimeException("Erro ao remover paciente", e);
-            }
+    public void removerPaciente (Long id){
 
+        if (!pacienteRepository.existsById(id)) {
+            throw new IllegalArgumentException("Paciente não encontrado.");
+        }
+        try {
+            pacienteRepository.deleteById(id);
+            log.info("Paciente com id {} removido com sucesso", id);
+        } catch (Exception e) {
+            log.error("Erro ao remover paciente com id {}: {}", id, e.getMessage());
+            throw new RuntimeException("Erro ao remover paciente", e);
         }
 
-        public Paciente alteraPaciente (PacienteDTO pacienteDTO){
-
-            Paciente pacienteExistente = pacienteRepository.findByCpf(pacienteDTO.cpf());
-            if (pacienteExistente == null) {
-                throw new IllegalArgumentException("Paciente não encontrado com o CPF informado.");
-            }
-
-            pacienteExistente.setNome(pacienteDTO.nome());
-            pacienteExistente.setCpf(pacienteDTO.cpf());
-            pacienteExistente.setEmail(pacienteDTO.email());
-
-            return pacienteRepository.save(pacienteExistente);
-        }
     }
+
+    public Paciente alteraPaciente(PacienteDTO pacienteDTO){
+        Paciente pacienteExistente = pacienteRepository.findByCpf(pacienteDTO.cpf());
+        if (pacienteExistente == null) {
+            throw new NaoEncontradoException("Paciente não encontrado com o CPF informado.");
+        }
+
+        pacienteExistente.setNome(pacienteDTO.nome());
+        pacienteExistente.setCpf(pacienteDTO.cpf());
+        pacienteExistente.setEmail(pacienteDTO.email());
+
+        return pacienteRepository.save(pacienteExistente);
+    }
+}
