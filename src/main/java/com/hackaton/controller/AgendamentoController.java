@@ -5,7 +5,6 @@ import com.hackaton.controller.json.ConcluirAgendamentoJson;
 import com.hackaton.controller.json.NovoAgendamentoJson;
 import com.hackaton.dto.AgendamentoConcluidoDTO;
 import com.hackaton.dto.AgendamentoDTO;
-import com.hackaton.dto.NovoAgendamentoDTO;
 import com.hackaton.entity.StatusConfirmacao;
 import com.hackaton.service.AgendamentoService;
 import jakarta.validation.Valid;
@@ -33,13 +32,13 @@ public class AgendamentoController {
     }
 
     @PostMapping("/marcar")
-    public ResponseEntity<NovoAgendamentoDTO> realizarAgendamento(@RequestBody @Valid NovoAgendamentoJson novoAgendamentoJson) {
+    public ResponseEntity<AgendamentoDTO> realizarAgendamento(@RequestBody @Valid NovoAgendamentoJson novoAgendamentoJson) {
         var horarioAgendado = agendamentoService.realizarAgendamento(novoAgendamentoJson.toDTO());
         return ResponseEntity.ok(horarioAgendado);
     }
 
     @PostMapping("/marcar/retorno")
-    public ResponseEntity<NovoAgendamentoDTO> agendarRetorno(
+    public ResponseEntity<AgendamentoDTO> agendarRetorno(
         @RequestParam Long idAgendamento,
         @Pattern(regexp = "[1-2]\\d{3}-[0-3]?\\d-[0-3]?\\d", message = "Formato data: yyyy-MM-dd") @RequestParam("data") String data
     ) {

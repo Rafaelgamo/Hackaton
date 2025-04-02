@@ -76,7 +76,7 @@ public class AgendamentoService {
         var agendamentoConcluido = optById.get();
         agendamentoConcluido.setStatus(StatusConfirmacao.CONCLUIDO);
 
-        NovoAgendamentoDTO retorno = null;
+        AgendamentoDTO retorno = null;
         if (concluirAgendamentoDTO.agendarRetorno()) {
             retorno = agendarRetorno(agendamentoConcluido, DIAS_PARA_RETORNO);
         }
@@ -85,7 +85,7 @@ public class AgendamentoService {
 
         return new AgendamentoConcluidoDTO(
             new AgendamentoDTO(agendamentoConcluido),
-            retorno == null ? null : new AgendamentoDTO(retorno)
+            retorno == null ? null : retorno
         );
     }
 
@@ -103,7 +103,7 @@ public class AgendamentoService {
         return new AgendamentoDTO(agendamento);
     }
 
-    public NovoAgendamentoDTO agendarRetorno(Long agendamentoId, LocalDate novaData) {
+    public AgendamentoDTO agendarRetorno(Long agendamentoId, LocalDate novaData) {
         var optById = agendamentoRepository.findById(agendamentoId);
         if (optById.isEmpty()) {
             throw new NaoEncontradoException("Agendamento não existente");
@@ -121,7 +121,7 @@ public class AgendamentoService {
         return agendarRetorno(medicoId, pacienteId, novaData, novaHora);
     }
 
-    public NovoAgendamentoDTO agendarRetorno(Agendamento agendamentoConcluido, Long diasParaRetorno) {
+    public AgendamentoDTO agendarRetorno(Agendamento agendamentoConcluido, Long diasParaRetorno) {
         var medicoId = agendamentoConcluido.getMedico().getId();
         var pacienteId = agendamentoConcluido.getPaciente().getId();
 
@@ -130,7 +130,7 @@ public class AgendamentoService {
         return agendarRetorno(medicoId, pacienteId, novaData, novaHora);
     }
 
-    public NovoAgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
+    public AgendamentoDTO realizarAgendamento(NovoAgendamentoDTO agendamentoDTO) {
         var medicoId = agendamentoDTO.idMedico();
         var pacienteId = agendamentoDTO.idPaciente();
         var novoAgendamento = new Agendamento();
@@ -164,10 +164,10 @@ public class AgendamentoService {
 
         var agendamentoSalvo = agendamentoRepository.save(novoAgendamento);
 
-        return new NovoAgendamentoDTO(agendamentoSalvo.getId(), agendamentoDTO, agendamentoSalvo.getStatus());
+        return new AgendamentoDTO(agendamentoSalvo);
     }
 
-    private NovoAgendamentoDTO agendarRetorno(Long medicoId, Long pacienteId, LocalDate novaData, LocalTime novaHora) {
+    private AgendamentoDTO agendarRetorno(Long medicoId, Long pacienteId, LocalDate novaData, LocalTime novaHora) {
         var horariosDisponiveisNaData = listarHorariosDisponiveisPorDiaEMedico(novaData, medicoId);
         if (horariosDisponiveisNaData.isEmpty()) {
             throw new ConflitoException("Médico indisponível na data do retorno - " + novaData);
