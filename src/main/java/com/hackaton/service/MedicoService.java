@@ -3,6 +3,8 @@ package com.hackaton.service;
 import com.hackaton.dto.AlterarMedicoDTO;
 import com.hackaton.dto.MedicoDTO;
 import com.hackaton.entity.Medico;
+import com.hackaton.exception.NaoEncontradoException;
+import com.hackaton.exception.ValidacaoException;
 import com.hackaton.repository.MedicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,8 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class MedicoService {
@@ -21,6 +21,11 @@ public class MedicoService {
 
     @Transactional
     public Long cadastroMedico(MedicoDTO medicoDTO) {
+
+        if (medicoRepository.existsByCrm(medicoDTO.crm())) {
+            throw new ValidacaoException("CRM " + medicoDTO.crm() + " já está cadastrado.");
+        }
+
         var medico = new Medico();
 
         medico.setNome(medicoDTO.nome());
@@ -41,7 +46,7 @@ public class MedicoService {
 
     @Transactional
     public Medico buscaPorId(Long id) {
-        var medico = medicoRepository.findById(id).orElse(null);
+        var medico = medicoRepository.findById(id).orElseThrow(() -> new NaoEncontradoException(id));
         return medico;
     }
 
@@ -64,8 +69,10 @@ public class MedicoService {
 
     @Transactional
     public void removerMedico(Long id) {
-        Optional<Medico> medicoDeletar = medicoRepository.findById(id);
-        medicoDeletar.ifPresent(value -> value.setAtivo(false));
+        Medico medico = medicoRepository.findById(id)
+                .orElseThrow(() -> new NaoEncontradoException(id));
+        medico.setAtivo(false);
     }
 
 }
+

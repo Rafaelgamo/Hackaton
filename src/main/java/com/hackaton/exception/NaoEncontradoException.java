@@ -13,4 +13,9 @@ public class NaoEncontradoException extends BaseHttpMappedException {
         super(message);
     }
 
+    public NaoEncontradoException(Long id) {
+        super("Médico com ID " + id + " não encontrado.");
+    }
+
+
 }

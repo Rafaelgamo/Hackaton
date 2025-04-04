@@ -1,6 +1,7 @@
 package com.hackaton.repository;
 
 import com.hackaton.entity.Medico;
+import com.hackaton.entity.Paciente;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,8 @@ public interface MedicoRepository extends JpaRepository<Medico, Long> {
     @Bean
     Optional<Medico> findById(Long id);
 
+
+    boolean existsByCrm(String crm);
 }
 
 

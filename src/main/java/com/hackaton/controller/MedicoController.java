@@ -4,6 +4,7 @@ import com.hackaton.dto.AlterarMedicoDTO;
 import com.hackaton.dto.MedicoDTO;
 import com.hackaton.entity.Medico;
 import com.hackaton.service.MedicoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,7 @@ public class MedicoController {
     private MedicoService medicoService;
 
     @PostMapping
-    public ResponseEntity<Void> cadastroMedico(@RequestBody MedicoDTO medicoDTO) {
+    public ResponseEntity<Long> cadastroMedico(@RequestBody @Valid MedicoDTO medicoDTO) {
         medicoService.cadastroMedico(medicoDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

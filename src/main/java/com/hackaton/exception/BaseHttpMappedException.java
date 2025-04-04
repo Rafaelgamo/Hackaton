@@ -17,5 +17,6 @@ public abstract class BaseHttpMappedException extends RuntimeException {
         this.httpStatus = getHttpStatus();
     }
 
+
 }
 
